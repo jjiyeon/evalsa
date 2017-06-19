@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+    <mapper namespace="Register">
+    	<resultMap type="reg" id="regMap">
+    		<result property="no" jdbcType="NUMERIC" column="no" />
+    		<result property="scheduleNo" jdbcType="NUMERIC" column="schedule_no"/>
+    		<result property="touristsiteNo" jdbcType="NUMERIC" column="touristsite_no"/>
+    		<result property="day" jdbcType="NUMERIC" column="day"/>
+    	</resultMap>
+    
+    	<insert id="register" parameterType="reg">
+    		INSERT INTO register (schedule_no, touristsite_no, day)
+    		values(#{scheduleNo}, #{touristsiteNo}, #{day})
+    	</insert>
+    	
+    	<insert id="registerList" parameterType="list">
+    		INSERT ALL
+    		<foreach collection="list" item="e" index="index">
+    			INTO register (no, schedule_no, touristsite_no, day)
+    			VALUES (#{e.no}, #{e.scheduleNo}, #{e.touristsiteNo}, #{e.day})
+    		</foreach>
+    		SELECT * FROM dual
+    	</insert>
+    	
+    	<delete id="removeOne" parameterType="reg">
+    		DELETE FROM register 
+    		WHERE 
+    			schedule_no = #{scheduleNo} AND 
+    			touristsite_no = #{touristsiteNo}
+    	</delete>
+    	
+    	<delete id="removeAll" parameterType="_int">
+    		DELETE FROM register
+    		WHERE
+    			schedule_no = #{value}
+    	</delete>
+    	
+    	<select id="findListByScheduleNo" parameterType="_int" resultMap="regMap">
+    		SELECT schedule_no, touristsite_no, day 
+    		FROM register
+    		WHERE
+    			schedule_no = #{value}
+    	</select>
+    	
+    	<select id="findDetailScheduleListByScheduleNo" parameterType="_int" resultType="hashMap">
+    		SELECT 
+    			r.no,
+				r.schedule_no, 
+				r.touristsite_no, 
+				r.day, 
+				t.name, 
+				t.city, 
+				t.address, 
+				t.imagepath, 
+				t.lat, 
+				t.lng
+			FROM 
+				register r, 
+				touristsite t
+			WHERE 
+				r.schedule_no = #{value} AND
+				r.touristsite_no = t.touristsite_no
+			ORDER BY
+				r.no ASC
+    	</select>
+    </mapper>

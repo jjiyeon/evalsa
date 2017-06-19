@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="reply">
+	<resultMap type="rep" id="replyList">
+		<result property="replyNo" column="reply_no" jdbcType="NUMERIC"/>
+		<result property="boardNo" column="board_no" jdbcType="NUMERIC"/>
+		<result property="nickname" column="nickname" jdbcType="VARCHAR"/>
+		<result property="writedate" column="writedate" jdbcType="DATE"/>
+		<result property="content" column="content" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<insert id="insertReply" parameterType="rep">
+		<selectKey keyProperty="replyNo"  resultType="int" order="BEFORE">
+			SELECT reply_seq.nextVal FROM dual
+		</selectKey>
+		insert into reply(reply_no, board_no, nickname, writedate, content)
+		values(#{replyNo},#{boardNo},#{nickname},SYSDATE,#{content})
+	</insert>
+	
+	<delete id="deleteReply" parameterType="rep">
+		delete from reply
+		where nickname=#{nickname} and board_no=#{boardNo} and reply_no=#{replyNo}
+	</delete>
+	
+	<select id="getAllReplyByBoardNo" parameterType="hashMap"  resultMap="replyList">
+		SELECT reply_no, board_no, nickname, writedate, content, rank FROM
+			(SELECT 
+				rownum AS rank,
+				reply_no, 
+				board_no,
+				nickname, 
+				writedate, 
+				content
+			FROM 
+				(SELECT * FROM reply WHERE board_no=#{boardNo} ORDER BY reply_no DESC)
+			WHERE
+				rownum &lt;= #{endArticle})
+		WHERE
+			rank &gt;= #{startArticle}
+		ORDER BY
+			rank ASC
+	</select>
+	
+	<select id="getSize" parameterType="_int" resultType="_int">
+		SELECT count(*) FROM reply WHERE board_no = #{value}
+	</select>
+</mapper>
+
+	

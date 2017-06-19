@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="board">
+	<resultMap type="bto" id="boardList">
+		<result property="boardNo" column="board_no" jdbcType="NUMERIC"/>
+		<result property="nickname" column="nickname" jdbcType="VARCHAR"/>
+		<result property="category" column="category" jdbcType="VARCHAR"/>
+		<result property="title" column="title" jdbcType="VARCHAR"/>
+		<result property="content" column="content" jdbcType="VARCHAR"/>
+		<result property="writedate" column="writedate" jdbcType="DATE"/>
+		<result property="hit" column="hit" jdbcType="NUMERIC"/>
+	</resultMap>
+	
+	<!-- 게시물을 하나 올리는 쿼리문 -->
+	<insert id="insertBoard" parameterType="bto">
+			insert into board(board_no, nickname, category, title, content, writedate,hit,filepath)
+			values(#{boardNo},#{nickname}, #{category}, #{title}, #{content}, SYSDATE,#{hit},#{filepath}) 
+	</insert>
+	
+	<!-- 시퀀스를 증가하고 반환하는 select문 -->
+	<select id="setBoardSeq" resultType="_int">
+		select board_seq.nextVal from dual
+	</select>
+	<!-- 최근에 올라온 게시물 5개를 불러오는 쿼리문 -->
+	<select id="getRecentBoard" parameterType="string" resultMap="boardList">
+		select board_no, title, nickname, hit from 
+		(select board_no, title, nickname, hit from board where category=#{value} order by board_no desc)
+		where rownum &lt;= 5
+	</select>
+	
+	<!-- 조회수가 높은 게시물을 5개 불러오는 쿼리문 -->
+	<select id="getBoardByHit" resultType="hashMap">
+		select distinct b.board_no, b.title, b.hit, m.nickname, ranking 
+		from (select board_no, title, nickname, hit, 
+		RANK() OVER(ORDER BY hit ASC, board_no ASC) as ranking from board) b, member m 
+		where b.nickname = m.nickname and ranking &lt;=5
+	</select>
+	
+	<!-- 해당 id에 대한 글을 가져오는 쿼리문 -->
+	<select id="getAllBoardById" resultType="hashMap">
+		select board_no, title, nickname, SYSDATE, hit
+		from board 
+		where id=#{value}
+	</select>
+	
+	<resultMap type="bto" id="boardListRM">
+		<result property="boardNo" column="board_no" jdbcType="NUMERIC"/>
+		<result property="title" column="title" jdbcType="VARCHAR"/>
+		<result property="nickname" column="nickname" jdbcType="VARCHAR"/>
+		<result property="writedate" column="writedate" jdbcType="DATE"/>
+		<result property="hit" column="hit" jdbcType="NUMERIC"/>
+	</resultMap>
+	<!-- 게시물 목록을 불러오는 쿼리문 -->
+	<select id="getBoardList" parameterType="hashMap" resultMap="boardListRM">
+		SELECT board_no, title, nickname, writedate, hit, rank FROM
+		   (SELECT
+		           rownum AS rank,
+		           board_no,
+		           title,
+		           nickname,
+		           to_char(writedate, 'YYYY-MM-DD HH24:mi') as writedate,
+		           hit
+		   FROM
+		           (SELECT * FROM board WHERE category=#{category} ORDER BY board_no DESC)
+		   WHERE
+		           rownum &lt;= #{endArticle})
+		WHERE
+		   rank &gt;= #{startArticle}
+		ORDER BY
+		   rank ASC
+	</select>
+	
+	<select id="getBoard" resultType="hashMap" parameterType="int">
+      select board_no, nickname, category, title, TO_CHAR(content) AS content, to_char(writedate, 'YYYY-MM-DD') as writedate, hit
+      from board
+      where board_no=#{value}
+   </select>
+	
+	<!-- 게시물을 수정하는 쿼리문 -->
+	<update id="updateBoard" parameterType="bto">
+		update board
+		set title=#{title},
+			content=#{content}
+		where board_no=#{boardNo}
+	</update>
+	<!-- 삭제 -->
+	<delete id="deleteBoard" parameterType="int">
+		delete from board
+		where board_no=#{value}
+	</delete>
+	
+	<!-- 조회수 증가 -->
+	<update id="increaseHit" parameterType="_int">
+		UPDATE board SET hit = hit + 1 WHERE board_no = #{value}
+	</update>
+	
+	<select id="getSize" parameterType="string" resultType="_int">
+		SELECT count(*) FROM board WHERE category=#{value}
+	</select>
+</mapper>

@@ -1,0 +1,131 @@
+
+#logo img {
+	width: 100px;
+	height: 100px;
+}
+
+#menubar {
+	text-align: center;
+	padding: 10px;
+	width: 100%;
+	background-color: #B22222;
+	color: white;
+}
+
+#imgsilde-center {
+	width: 300px;
+	height: 300px;
+	padding: 5px;
+	position: absolute;
+}
+
+/* 이미지 슬라이드 */
+#abox {
+	width: 100%;
+	height: 500px;
+	overflow: hidden;
+	left: 100px;
+	position: 0% 50% relative;
+	
+}
+
+#a {
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	position: relative;
+	xoverflow: hidden;
+
+}
+
+#a li {
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	height: 700px;
+	list-style: none;
+	float: left;
+}
+
+#a img {
+	width: 100%;
+	height: 100%
+}
+
+#imgsilde-start, #imgsilde-end {
+	width: 100px;
+	height: 100px;
+}
+
+#imgsilde-middle {
+	width: 200px;
+	height: 200px;
+	padding: 5px;
+}
+
+#recentschedule img {
+	width: 100%;
+	height: 100%;
+	opacity: 0.8;
+}
+
+.recentBox{
+	padding: 0px 15px 0px 15px;
+	position: relative;
+	width: 300px;
+	height: 300px;
+	float: left;
+}
+
+.recentTitle{
+	position: absolute;
+	color: white;
+	font-size: x-large;
+	font-weight: bold;
+	text-decoration: underline;
+	top: 50%; left:50%;
+}
+
+.themebox{
+	opacity:1;
+}
+
+.theme{
+	position: absolute;
+	color: white;
+	top: 10%; left:3%;
+}
+.recentTheme{
+	position: absolute;
+	color: #feac5a;
+	font-size: large;
+	font-weight: normal;
+	top: 3%; left: 6%;
+}
+.recentId{
+	position: absolute;
+	color: white;
+	font-size: large;
+	font-weight: normal;
+	top: 90%; left: 50%;
+}
+.title_cnt{
+	width: 45px;
+	font-size: 12px;
+	color: #b3b3b3;
+	text-align: right;
+	paddingj-right: 5px;
+	height: 30px;
+	line-height:30px;
+}
+
+
+
+/*
+	card box css
+*/
+
+.box{
+	margin: 50px;
+}

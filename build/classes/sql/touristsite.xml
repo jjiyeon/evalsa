@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="touristsite">
+
+	<resultMap type="tour" id="touristsiteList">
+		<result property="touristsiteNo" column="touristsite_no"  jdbcType="NUMERIC"/>
+		<result property="name" column="name"  jdbcType="VARCHAR"/>
+		<result property="city" column="city"  jdbcType="VARCHAR"/>
+		<result property="address" column="address"  jdbcType="VARCHAR"/>
+		<result property="description" column="description"  jdbcType="CLOB"/>
+		<result property="lat" column="lat"  jdbcType="VARCHAR"/>
+		<result property="lng" column="lng"  jdbcType="VARCHAR"/>
+		<result property="category" column="category"  jdbcType="VARCHAR"/>
+		<result property="imagepath" column="imagepath"  jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	
+	<sql id="select-touristsite">
+		select touristsite_no, name, city, address, description, lat, lng, category, imagepath
+		from touristsite
+	</sql>
+	<select id="getTouristSite" parameterType="int" resultMap="touristsiteList">
+		<include refid="select-touristsite" />
+		where touristsite_no=#{touristsiteNo}
+	</select>
+	
+	<select id="getTouristSiteByCategory" parameterType="string" resultMap="touristsiteList">
+		<include refid="select-touristsite" />
+		where category = #{value}
+	</select>
+	
+	<select id="getAllTouirstSite" resultMap="touristsiteList">
+		<include refid="select-touristsite" />
+	</select>
+	
+	<select id="getTouristSiteByCity" parameterType="string" resultMap="touristsiteList">
+		<include refid="select-touristsite" />
+		where city = #{value} 
+	</select>
+	
+	<select id="getTouristSiteByCityAndCategory" parameterType="java.util.HashMap" resultMap="touristsiteList">
+		<include refid="select-touristsite" />
+		where city = #{city} and category=#{category}
+	</select>
+	
+	
+</mapper>

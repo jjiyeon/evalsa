@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="Member">
+	<!-- resultMap이 필요한지는 다시 생각해볼 필요 있음 -->
+	<!-- insert :: 회원가입 // 나중에 parameterType 확인필요-->
+	<sql id="select-member">
+		select count(-1) from member
+	</sql>
+
+	<insert id="registerMember" parameterType="mem">
+		insert into member(id, password, nickname, permission, certification)
+		values(#{id}, #{password}, #{nickname}, 0, #{certification})
+	</insert>
+	
+	<!-- 로그인 -->
+	<select id="loginMember" parameterType="mem" resultType="mem">
+		select id, password, nickname, permission, certification
+		from member
+		where id=#{id} and password = #{password}
+	</select>
+	
+	<!-- 회원정보 수정 -->
+	<update id="updateMember" parameterType="mem">
+		update member
+		set password=#{password},
+    	nickname=#{nickname}
+		where id=#{id}
+	</update>
+	
+	<!-- 회원정보 삭제 -->
+	<delete id="deleteMember" parameterType="String">
+		delete from member
+		where id = #{value}
+	</delete>
+	
+	<!-- idCheck -->
+	<select id="idcheck" parameterType="String" resultType="_int">
+		<include refid="select-member"/>
+		where id=#{id}
+	</select>
+	
+	<!-- nicknameCheck -->
+	<select id="nicknameCheck" parameterType="String" resultType="_int">
+		<include refid="select-member" />
+		WHERE nickname=#{value}
+	</select>
+</mapper>

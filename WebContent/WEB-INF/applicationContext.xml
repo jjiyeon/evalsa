@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+<!-- persistence Layer -->
+
+<!-- 1. jdbc.properties 파일 placeholder,  BasicDataSource빈 등록 -->
+ <context:property-placeholder location="classpath:config/jdbc.properties"/>
+
+<!-- db 정보 -->
+<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+   <property name="driverClassName" value="${JDBC.Driver}"/>
+   <property name="url" value="${JDBC.ConnectionURL}"/>
+   <property name="username" value="${JDBC.Username}"/>
+   <property name="password" value="${JDBC.Password}"/>
+</bean>
+
+<!-- 2. MyBatis 설정 부분 ::  sqlSessionFactory,sqlSession 둥록 -->
+<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+   <property name="dataSource" ref="dataSource"/>
+   <property name="configLocation" value="classpath:config/SqlMapConfig.xml"/>
+</bean>
+
+<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+   <constructor-arg ref="sqlSessionFactory" />
+</bean>
+
+
+<!-- Member :: DAO / Service 등록 -->
+<bean id="memberDAO" class="org.evalsa.italytour.model.dao.impl.MemberDAOImpl">
+	<property name="sqlSession" ref="sqlSession" />
+</bean>
+
+<bean id="memberService" class="org.evalsa.italytour.model.service.impl.MemberServiceImpl">
+	<property name="memberDAO" ref="memberDAO" />
+</bean>
+
+<!-- TouristSite :: DAO / Service 등록 -->
+<bean id="touristSiteDAO" class="org.evalsa.italytour.model.dao.impl.TouristSiteDAOImpl">
+	<property name="sqlSession" ref="sqlSession" />
+</bean>
+
+<bean id="touristSiteService" class="org.evalsa.italytour.model.service.impl.TouristSiteServiceImpl">
+	<property name="touristSiteDAO" ref="touristSiteDAO" />
+</bean>
+
+<!-- Register :: DAO / Service 등록 -->
+<bean id="registerDAO" class="org.evalsa.italytour.model.dao.impl.RegisterDAOImpl">
+	<property name="sqlSession" ref="sqlSession" />
+</bean>
+<bean id="registerService" class="org.evalsa.italytour.model.service.impl.RegisterServiceImpl">
+	<property name="registerDAO" ref="registerDAO" />
+</bean>
+
+<!-- Schedule :: DAO / Service 등록 -->
+<bean id="scheduleDAO" class="org.evalsa.italytour.model.dao.impl.ScheduleDAOImpl">
+	<property name="sqlSession" ref="sqlSession" />
+</bean>
+<bean id="scheduleService" class="org.evalsa.italytour.model.service.impl.ScheduleServiceImpl">
+	<property name="scheduleDAO" ref="scheduleDAO" />
+</bean>
+
+<!--  Board :: DAO / Service 등록 -->
+<bean id="boardDAO" class="org.evalsa.italytour.model.dao.impl.BoardDAOImpl">
+	<property name="sqlSession" ref="sqlSession"/>
+</bean>
+<bean id="boardService" class="org.evalsa.italytour.model.service.impl.BoardServiceImpl">
+	<property name="boardDAO" ref="boardDAO"/>
+</bean>
+
+<!-- Gallery :: DAO / Service 등록 -->
+<bean id="galleryDAO" class="org.evalsa.italytour.model.dao.impl.GalleryDAOImpl">
+	<property name="sqlSession" ref="sqlSession" />
+</bean>
+<bean id="galleryService" class="org.evalsa.italytour.model.service.impl.GalleryServiceImpl">
+	<property name="galleryDAO" ref="galleryDAO" />
+</bean>
+
+<!-- Reply :: DAO / Service 등록 -->
+<bean id="replyDAO" class="org.evalsa.italytour.model.dao.impl.ReplyDAOImpl">
+	<property name="sqlSession" ref="sqlSession" />
+</bean>
+<bean id="replyService" class="org.evalsa.italytour.model.service.impl.ReplyServiceImpl">
+	<property name="replyDAO" ref="replyDAO" />
+</bean>
+
+</beans>

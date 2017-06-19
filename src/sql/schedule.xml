@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+
+<mapper namespace="Schedule">
+	<resultMap type="sch" id="scheduleList">
+		<result property="scheduleNo" column="schedule_no" jdbcType="NUMERIC"/>
+		<result property="title" column="title" jdbcType="VARCHAR"/>
+		<result property="term" column="term" jdbcType="VARCHAR"/>
+		<result property="theme" column="theme" jdbcType="VARCHAR"/>
+		<result property="sharing" column="sharing" jdbcType="NUMERIC"/>
+		<result property="nickname" column="nickname" jdbcType="VARCHAR"/>
+		<result property="mainImage" column="mainimage" jdbcType="VARCHAR"/>
+		<result property="hit" column="hit" jdbcType="NUMERIC"/>
+		<result property="likeup" column="likeup" jdbcType="NUMERIC"/>
+	</resultMap>
+	
+	<sql id="select-touristsite">
+		select touristsite_no, name, city, address, description, lat, lng, category, imagepath
+		from touristsite
+	</sql>
+	
+	<sql id="select-schedule">
+		select schedule_no, title, term, theme, sharing, nickname, mainimage
+		from schedule
+	</sql>
+	
+	<insert id="insertSchedule" parameterType="sch">
+		<selectKey keyProperty="scheduleNo" resultType="int" order="BEFORE">
+		   select schedule_seq.nextVal from dual
+		</selectKey>
+		insert into schedule(schedule_no, title, term, theme, sharing, nickname, mainimage)
+		values(#{scheduleNo}, #{title}, #{term}, #{theme}, #{sharing}, #{nickname}, #{mainImage})
+	</insert>
+
+	<update id="updateSchedule" parameterType="sch">
+		update schedule
+		set title=#{title},
+		    term=#{term},
+		    theme=#{theme}
+		where schedule_no=#{scheduleNo}
+	</update>
+	
+	<update id="updateSharing" parameterType="sch">
+		update schedule
+		set sharing=#{sharing}
+		where schedule_no=#{scheduleNo}
+	</update>
+	
+	<delete id="deleteSchedule" parameterType="int">
+		delete from schedule
+		where schedule_no=#{scheduleNo}
+	</delete>
+	
+	<select id="getSchedule" parameterType="_int" resultType="hashMap">
+		SELECT 
+			schedule_no,
+			nickname, 
+			title, 
+			term, 
+			theme, 
+			hit, 
+			likeup, 
+			sharing
+		FROM 
+			schedule
+		WHERE 
+			schedule_no = #{value}
+	</select>
+	
+	<select id="getScheduleByDto" parameterType="sch" resultMap="scheduleList">
+		<include refid="select-schedule" />
+		where schedule_no = #{scheduleNo} and nickname = #{nickname}
+	</select>
+	
+	<!-- 모든 일정들을 가지고 오는 select문 -->
+	<select id="getAllScheduleList" parameterType="String"  resultMap="scheduleList">
+		<include refid="select-schedule" />
+		where nickname = #{value} 
+		order by schedule_no desc
+	</select>
+	
+	<!-- 공개로 설정된 일정들 가지고 오는 select문' -->
+	<select id="getScheduleBySharing" resultType="hashMap">
+      SELECT schedule_no, title, term, theme, sharing, nickname, mainimage, hit, likeup, rank FROM
+		   (SELECT
+		           rownum AS rank,
+		           schedule_no, 
+		           title, 
+		           term, 
+		           theme, 
+		           sharing, 
+		           nickname, 
+		           mainimage, 
+		           hit, 
+		           likeup
+		   FROM
+		           (SELECT * FROM schedule WHERE sharing=1 ORDER BY schedule_no DESC)
+		   WHERE
+		           rownum &lt;= #{endArticle})
+		WHERE
+		   rank &gt;= #{startArticle}
+		ORDER BY
+		   rank ASC
+   </select>
+	
+	<!-- 공개로 설정된 일정들 중에서 추천수가 가장 높은 순으로 상위 3개 일정 가지고 오는  select 문 -->
+	<select id="getScheduleByLikeUpTopThree" resultType="hashMap">
+		select distinct schedule_no, title, term, theme, sharing, mainimage, hit, likeup, nickname, ranking 
+		from (select schedule_no, title, term, theme, sharing, nickname, mainimage, hit, likeup, 
+		RANK() OVER(ORDER BY likeup DESC, hit ASC, schedule_no ASC) as ranking from schedule) 
+		where ranking &lt;=3 and sharing=1
+		order by ranking asc
+	</select>
+	
+	<!-- 시퀀스를 증가하고 반환하는 select문 -->
+	<select id="setScheduleSeq" resultType="_int">
+		select schedule_seq.currVal from dual
+	</select>
+	
+	<!-- 최근 작성된 일정을 4개 가지고 오는 select문 -->
+	<select id="getRecentSchedule" resultType="hashMap">
+		select schedule_no, title, term, theme, sharing, nickname, mainimage from 
+		(select schedule_no, title, term, theme, sharing, nickname, mainimage from schedule order by schedule_no desc)
+		where sharing=1 and rownum &lt;= 4
+	</select>
+	
+	<!-- hit 증가 -->
+	<update id="increaseHit" parameterType="_int">
+		UPDATE schedule SET hit = hit + 1 WHERE schedule_no = #{value}
+	</update>
+	
+	<!-- likeup 증가 -->
+	<update id="increaseLikeup" parameterType="_int">
+		UPDATE schedule SET likeup = likeup + 1 WHERE schedule_no = #{value}
+	</update>
+	
+	<!-- likeup 반환 -->
+	<select id="getLikeupByScheduleNo" resultType="_int" parameterType="_int">
+		SELECT likeup FROM schedule WHERE schedule_no = #{value}
+	</select>
+	
+	<select id="getSize" resultType="_int">
+		SELECT count(schedule_no) FROM schedule WHERE sharing = 1
+	</select>
+</mapper>

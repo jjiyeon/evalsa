@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+	
+<configuration>
+	<properties resource="config/jdbc.properties" />	
+	<settings>
+	 	<setting name="jdbcTypeForNull" value="NULL"/>
+	 </settings>
+	 <typeAliases>
+		  <typeAlias type="org.evalsa.italytour.model.dto.MemberDTO" alias="mem"/>
+	      <typeAlias type="org.evalsa.italytour.model.dto.BoardDTO" alias="bto"/>
+	      <typeAlias type="org.evalsa.italytour.model.dto.GalleryDTO" alias="gal"/>
+	      <typeAlias type="org.evalsa.italytour.model.dto.RegisterDTO" alias="reg"/>
+	      <typeAlias type="org.evalsa.italytour.model.dto.ReplyDTO" alias="rep"/>
+	      <typeAlias type="org.evalsa.italytour.model.dto.ScheduleDTO" alias="sch"/>
+	      <typeAlias type="org.evalsa.italytour.model.dto.TouristSiteDTO" alias="tour"/>
+     </typeAliases>
+	 <environments default="development">
+		<environment id="development" >
+		<transactionManager type="JDBC" />
+			<dataSource type="UNPOOLED">
+				<property name="driver" value="${JDBC.Driver}"/>
+				<property name="url" value="${JDBC.ConnectionURL}"/>
+				<property name="username" value="${JDBC.Username}"/>
+				<property name="password" value="${JDBC.Password}"/>
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<mappers>
+		<mapper resource="sql/member.xml"/>
+		<mapper resource="sql/schedule.xml"/>
+		<mapper resource="sql/touristsite.xml"/>
+		<mapper resource="sql/register.xml"/>
+		<mapper resource="sql/board.xml"/>
+		<mapper resource="sql/gallery.xml"/>
+		<mapper resource="sql/reply.xml"/>
+	</mappers>
+	
+</configuration>
